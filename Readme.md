@@ -16,7 +16,7 @@
     </td>
     <td>
       <strong>Role:</strong> TheMaintainer 🛠️ <br>
-        I just need 17 octets for the system.
+        I just need 17 octets to maintain.
     </td>
   </tr>
 </table>
