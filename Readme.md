@@ -24,7 +24,7 @@
            style="border: 3px solid black; border-radius: 10px; padding: 5px;">
     </td>
     <td>
-      <strong>Role:</strong> TheMaintainer 🛠️ <br>
+      <strong>Role:</strong> TheMaintainer<br>
         I just need 17 octets to maintain.
     </td>
   </tr>
