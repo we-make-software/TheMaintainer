@@ -15,7 +15,7 @@
            style="border: 3px solid black; border-radius: 10px; padding: 5px;">
     </td>
     <td>
-      <strong>Role:</strong> TheMailConditioner<br>
+      <strong>Role:</strong> TheMailConditioner
     </td>
   </tr>
   <tr style="border: none;">
@@ -24,8 +24,7 @@
            style="border: 3px solid black; border-radius: 10px; padding: 5px;">
     </td>
     <td>
-      <strong>Role:</strong> TheMaintainer<br>
-        I just need 17 octets to maintain.
+      <strong>Role:</strong> TheMaintainer
     </td>
   </tr>
 </table>
