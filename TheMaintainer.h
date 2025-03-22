@@ -3,14 +3,16 @@
 #include "../TheMailConditioner/TheMailConditioner.h"
 extern struct TheMailConditioner*GetTheMaintainer(u8*value);
 #define TM(name, ...) \
-    struct TheMailConditione*tmc##name=GetTheMaintainer((u8[]){__VA_ARGS__}); \
+    struct TheMailConditioner*tmc##name = GetTheMaintainer((u8[]){__VA_ARGS__}); \
     struct name*name##TM=NULL; \
     if(!GetTheMailConditionerData(tmc##name)) { \
-        name##TM=(struct name*)GetTheMailConditionerData(GetTheMailConditionerUnsafeData(GetTheMaintainer((u8[]){__VA_ARGS__}))); \
+        name##TM=(struct name*)GetTheMailConditionerData(tmc##name); \
         printk(KERN_ERR #name ": Can't get the " #name " TM.\n"); \
     }
 #define SetupTM(description,version,build,...) \
-    static struct TheMailConditione*tmcTM; \
+    static void TMStart(void);\
+    static void TMEnd(void);\
+    static struct TheMailConditioner*tmcTM; \
     static void End(void){ \
         TMEnd(); \
         CancelTheMailConditioner(tmcTM); \
