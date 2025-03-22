@@ -11,4 +11,4 @@ struct TheMailConditioner*GetTheMaintainer(u8*value){
 EXPORT_SYMBOL(GetTheMaintainer);
 static void End(void){}
 static void Start(void){}
-Setup("TheMaintainer",0,0)
+Setup(TheMaintainer,0,0)
