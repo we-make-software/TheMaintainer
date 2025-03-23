@@ -12,14 +12,27 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
     }
 #define SetupTM(description,version,build,...) \
     static void TMStart(void);\
-    static void TMEnd(void);\
+    static void TMEnd(void*);\
     static struct TheMailConditioner*tmcTM; \
-    static void End(void){ \
-        CancelTheMailConditioner(tmcTM); \
-    } \
+    static bool TMEndCalled=false; \
     static void AutoDeleteTM(void* data,struct ExpiryWorkBaseBenchmark){ \
-        TMEnd(); \
-        kfree(data); \
+        if(!TMEndCalled)\
+            TMEndCalled=true; \
+        if(data) { \
+            TMEnd(data); \
+            if(data) \
+            kfree(data); \
+        } \
+    } \
+    static void End(void){ \ 
+        if(TMEndCalled) \
+            return; \
+        void *data=GetTheMailConditionerData(tmcTM); \
+        if(data) { \
+            TMEnd(data); \
+            if(data) \
+            kfree(data); \
+        } \
     } \
     static void Start(void){ \
         u8 TMKey[17]={__VA_ARGS__}; \
@@ -28,23 +41,11 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
             return; \
         } \
         tmcTM=GetTheMaintainer(TMKey); \
-        printk(KERN_INFO #description ": The " #description " TM has been started.\n"); \
         if (!tmcTM){ \
             printk(KERN_ERR #description ": Can't get the " #description " TM.\n"); \
             return; \
         } \
-    } \
-    Setup(description,version,build)
-#define SetTM(name,method)name->method=method 
-#endif
-
-/*
-        tmcTM=GetTheMaintainer((u8[]){__VA_ARGS__}); \
-        if (!tmcTM){ \
-            printk(KERN_ERR #description ": Can't get the " #description " TM.\n"); \
-            return; \
-        } \
-  if (!GetTheMailConditionerUnsafeData(tmcTM)){ \
+        if (!GetTheMailConditionerUnsafeData(tmcTM)){ \
             void*tmObject=kmalloc(sizeof(struct description),GFP_KERNEL); \
             if(!tmObject){ \
                 printk(KERN_ERR #description ": Can't allocate memory for the " #description " TM.\n"); \
@@ -59,4 +60,8 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
             SetAutoDeleteTheMailConditioner(tmcTM,AutoDeleteTM); \
             TMStart(); \
         } \
-*/
+    } \
+    Setup(description,version,build)
+#define SetTM(name,method)name->method=method 
+#endif
+
