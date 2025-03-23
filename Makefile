@@ -11,9 +11,11 @@ clean:
 start:
 	make all
 	sudo insmod TheMaintainer.ko
+
 stop:
 	sudo rmmod TheMaintainer.ko
-	make clear
+	make clean
+
 commit:
 	@if ! git diff-index --quiet HEAD; then \
 		git add . && \
