@@ -22,21 +22,24 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
             TMEnd(data); \
             if(data) \
             kfree(data); \
+            data=NULL;\
         } \
     } \
-    static void End(void){ \ 
+    static void End(void){ \
         if(TMEndCalled) \
             return; \
-        void *data=GetTheMailConditionerData(tmcTM); \
+        void*data=GetTheMailConditionerData(tmcTM); \
         if(data) { \
             TMEnd(data); \
             if(data) \
             kfree(data); \
+            data=NULL;\
         } \
     } \
     static void Start(void){ \
         u8 TMKey[17]={__VA_ARGS__}; \
         if(IsTheMaintainerUsed(TMKey)){ \
+            TMStart(); \
             printk(KERN_ERR #description ": The " #description " TM is already in use.\n"); \
             return; \
         } \
@@ -45,7 +48,7 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
             printk(KERN_ERR #description ": Can't get the " #description " TM.\n"); \
             return; \
         } \
-        if (!GetTheMailConditionerUnsafeData(tmcTM)){ \
+        if (!GetTheMailConditionerData(tmcTM)){ \
             void*tmObject=kmalloc(sizeof(struct description),GFP_KERNEL); \
             if(!tmObject){ \
                 printk(KERN_ERR #description ": Can't allocate memory for the " #description " TM.\n"); \
