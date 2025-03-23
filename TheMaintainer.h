@@ -15,30 +15,35 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
     static void TMEnd(void);\
     static struct TheMailConditioner*tmcTM; \
     static void End(void){ \
-        TMEnd(); \
         CancelTheMailConditioner(tmcTM); \
     } \
     static void AutoDeleteTM(void* data,struct ExpiryWorkBaseBenchmark){ \
+        TMEnd(); \
         kfree(data); \
     } \
     static void Start(void){ \
-       if(IsTheMaintainerUsed((u8[]){__VA_ARGS__})){ \
+        u8 TMKey[17]={__VA_ARGS__}; \
+        if(IsTheMaintainerUsed(TMKey)){ \
             printk(KERN_ERR #description ": The " #description " TM is already in use.\n"); \
             return; \
         } \
-        printk(KERN_INFO #description ": The " #description " TM has not started.\n"); \
-        tmcTM=GetTheMaintainer((u8[]){__VA_ARGS__}); \
+        tmcTM=GetTheMaintainer(TMKey); \
+        printk(KERN_INFO #description ": The " #description " TM has been started.\n"); \
         if (!tmcTM){ \
             printk(KERN_ERR #description ": Can't get the " #description " TM.\n"); \
             return; \
         } \
-        printk(KERN_INFO #description ": The " #description " TM has been started.\n"); \
     } \
     Setup(description,version,build)
 #define SetTM(name,method)name->method=method 
 #endif
 
 /*
+        tmcTM=GetTheMaintainer((u8[]){__VA_ARGS__}); \
+        if (!tmcTM){ \
+            printk(KERN_ERR #description ": Can't get the " #description " TM.\n"); \
+            return; \
+        } \
   if (!GetTheMailConditionerUnsafeData(tmcTM)){ \
             void*tmObject=kmalloc(sizeof(struct description),GFP_KERNEL); \
             if(!tmObject){ \
