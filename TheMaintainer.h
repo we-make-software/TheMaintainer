@@ -53,7 +53,10 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
             return; \
         void*data=GetTheMailConditionerData(tmcTM); \
         if(data)\
-            TMEnd(data); \
+        { \
+            TMEnd(data);\
+            kfree(data);\
+        } \
     } \
     static void Start(void){ \
         u8 TMKey[17]={__VA_ARGS__}; \
