@@ -40,9 +40,10 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
             TMEndCalled=true; \
         if(data)\
             TMEnd(data); \
-        if(data) \
+        if(data){\
             kfree(data); \
-        data=NULL; \
+            data=NULL; \
+        } \
     } \
     static void End(void){ \
         UnregisterRecoverTheMaintainer((u8[]){__VA_ARGS__}); \
@@ -51,9 +52,10 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
         void*data=GetTheMailConditionerData(tmcTM); \
         if(data)\
             TMEnd(data); \
-        if(data) \
+        if(data){\
             kfree(data); \
-        data=NULL;\
+            data=NULL; \
+        } \
     } \
     static void Start(void){ \
         u8 TMKey[17]={__VA_ARGS__}; \
