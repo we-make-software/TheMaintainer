@@ -8,7 +8,10 @@ static LIST_HEAD(RecoverList);
 static DEFINE_MUTEX(RecoverMutex);
 void RegisterRecoverTheMaintainer(u8*ID,void(*Start)(void)){
     if(!ID||!Start)return;
-    struct Recover*recover=kmalloc(sizeof(struct Recover),GFP_KERNEL);
+    struct Recover*recover=NULL,*tmp=NULL;
+    list_for_each_entry_safe(recover,tmp,&RecoverList,list)
+    if(memcmp(recover->ID,ID,17)==0) return;
+    recover=kmalloc(sizeof(struct Recover),GFP_KERNEL);
     if(!recover)return;
     memcpy(recover->ID,ID,17);
     recover->Start=Start;
@@ -33,14 +36,19 @@ void UnregisterRecoverTheMaintainer(u8*ID){
 EXPORT_SYMBOL(UnregisterRecoverTheMaintainer);
 void TriggerRecoverTheMaintainer(u8*ID){
     if(!ID)return;
-    struct Recover*recover=NULL;
+    if(GetTheMailConditionerData(GetTheMaintainer(ID)))return;
     mutex_lock(&RecoverMutex);
+    if(GetTheMailConditionerData(GetTheMaintainer(ID))){
+        mutex_unlock(&RecoverMutex);
+        return;
+    }
+    struct Recover*recover=NULL;
     list_for_each_entry(recover,&RecoverList,list)
         if(memcmp(recover->ID,ID,17)==0){
             recover->Start();
             break;
         }
-    mutex_unlock(&RecoverMutex);
+    mutex_unlock(&RecoverMutex);    
 }
 EXPORT_SYMBOL(TriggerRecoverTheMaintainer);
 bool IsTheMaintainerUsed(u8*value){

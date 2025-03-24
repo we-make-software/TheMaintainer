@@ -7,27 +7,32 @@ extern void RegisterRecoverTheMaintainer(u8*ID,void(*Start)(void));
 extern void UnregisterRecoverTheMaintainer(u8*ID);
 extern void TriggerRecoverTheMaintainer(u8*ID);
 #define TM(name,...) \
-    struct TheMailConditioner*tmc##name = GetTheMaintainer((u8[]){__VA_ARGS__}); \
-    if(!tmc##name){ \
-        TriggerRecoverTheMaintainer((u8[]){__VA_ARGS__}); \
-        tmc##name=GetTheMaintainer((u8[]){__VA_ARGS__}); \
-        if(!tmc##name){ \
-            printk(KERN_ERR #name ": Can't get the " #name " TM.\n"); \
-            return (void)(0); \
-        } \
-    } \
-    struct name*name##TM=(struct name*)GetTheMailConditionerData(tmc##name) 
+    struct TheMailConditioner*tmc##name=GetTheMaintainer((u8[]){__VA_ARGS__});\
+    struct name*name##TM=(struct name*)GetTheMailConditionerData(tmc##name);\
+    if(!name##TM){\
+        TriggerRecoverTheMaintainer((u8[]){__VA_ARGS__});\
+        tmc##name=GetTheMaintainer((u8[]){__VA_ARGS__});\
+        name##TM=(struct name*)GetTheMailConditionerData(tmc##name);\
+        if(!name##TM){\
+            printk(KERN_ERR #name ": Can't get the " #name " TM.\n");\
+            return;\
+        }\
+    }
 #define TMFailback(name,failback,...) \
-    struct TheMailConditioner*tmc##name = GetTheMaintainer((u8[]){__VA_ARGS__}); \
-    if(!tmc##name){ \
-        TriggerRecoverTheMaintainer((u8[]){__VA_ARGS__}); \
-        tmc##name = GetTheMaintainer((u8[]){__VA_ARGS__}); \
-        if(!tmc##name){ \
-            printk(KERN_ERR #name ": Can't get the " #name " TM.\n"); \
-            return failback; \
-        } \
-    } \
-    struct name*name##TM = (struct name*)GetTheMailConditionerData(tmc##name)
+    struct TheMailConditioner*tmc##name=GetTheMaintainer((u8[]){__VA_ARGS__});\
+    struct name*name##TM=(struct name*)GetTheMailConditionerData(tmc##name);\
+    if(!name##TM){\
+        TriggerRecoverTheMaintainer((u8[]){__VA_ARGS__});\
+        tmc##name=GetTheMaintainer((u8[]){__VA_ARGS__});\
+        name##TM=(struct name*)GetTheMailConditionerData(tmc##name);\
+        if(!name##TM){\
+            printk(KERN_ERR #name ": Can't get the " #name " TM.\n");\
+            return failback;\
+        }\
+    }
+
+
+
 
 #define SetupTM(description,version,build,...) \
     static void TMStart(void);\
