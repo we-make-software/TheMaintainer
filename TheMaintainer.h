@@ -22,7 +22,7 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
             TMEnd(data); \
         if(data) \
             kfree(data); \
-        data=NULL;\  
+        data=NULL; \
     } \
     static void End(void){ \
         if(TMEndCalled) \
@@ -58,12 +58,11 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
                 End(); \
                 return; \
             } \
-            SetupExpiryWorkBase(&tmObject->ewb,GetTheMailConditionerEWB(tmcTM), tmObject, AutoDeleteTM); \  
+            SetupExpiryWorkBase(&tmObject->ewb,GetTheMailConditionerEWB(tmcTM), tmObject, AutoDeleteTM); \
             TMStart(); \
         } \
     } \
     Setup(description,version,build)
 #define SetTM(name,method)name->method=method
-
 #endif
 
