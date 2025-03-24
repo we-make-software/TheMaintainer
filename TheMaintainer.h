@@ -3,13 +3,32 @@
 #include "../TheMailConditioner/TheMailConditioner.h"
 extern bool IsTheMaintainerUsed(u8*value);
 extern struct TheMailConditioner*GetTheMaintainer(u8*value);
+extern void RegisterRecoverTheMaintainer(u8*ID,void(*Start)(void));
+extern void UnregisterRecoverTheMaintainer(u8*ID);
+extern void TriggerRecoverTheMaintainer(u8*ID);
 #define TM(name,...) \
     struct TheMailConditioner*tmc##name = GetTheMaintainer((u8[]){__VA_ARGS__}); \
-    struct name*name##TM=NULL; \
-    if(!GetTheMailConditionerData(tmc##name)) { \
-        name##TM=(struct name*)GetTheMailConditionerData(tmc##name); \
-        printk(KERN_ERR #name ": Can't get the " #name " TM.\n"); \
-    }
+    if(!tmc##name){ \
+        TriggerRecoverTheMaintainer((u8[]){__VA_ARGS__}); \
+        tmc##name=GetTheMaintainer((u8[]){__VA_ARGS__}); \
+        if(!tmc##name){ \
+            printk(KERN_ERR #name ": Can't get the " #name " TM.\n"); \
+            return (void)(0); \
+        } \
+    } \
+    struct name*name##TM=(struct name*)GetTheMailConditionerData(tmc##name) 
+#define TMFailback(name,failback,...) \
+    struct TheMailConditioner*tmc##name = GetTheMaintainer((u8[]){__VA_ARGS__}); \
+    if(!tmc##name){ \
+        TriggerRecoverTheMaintainer((u8[]){__VA_ARGS__}); \
+        tmc##name = GetTheMaintainer((u8[]){__VA_ARGS__}); \
+        if(!tmc##name){ \
+            printk(KERN_ERR #name ": Can't get the " #name " TM.\n"); \
+            return failback; \
+        } \
+    } \
+    struct name*name##TM = (struct name*)GetTheMailConditionerData(tmc##name)
+
 #define SetupTM(description,version,build,...) \
     static void TMStart(void);\
     static void TMEnd(void*);\
@@ -25,6 +44,7 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
         data=NULL; \
     } \
     static void End(void){ \
+        UnregisterRecoverTheMaintainer((u8[]){__VA_ARGS__}); \
         if(TMEndCalled) \
             return; \
         void*data=GetTheMailConditionerData(tmcTM); \
@@ -60,6 +80,7 @@ extern struct TheMailConditioner*GetTheMaintainer(u8*value);
             } \
             SetupExpiryWorkBase(&tmObject->ewb,GetTheMailConditionerEWB(tmcTM), tmObject, AutoDeleteTM); \
             TMStart(); \
+            RegisterRecoverTheMaintainer(TMKey,Start); \
         } \
     } \
     Setup(description,version,build)
