@@ -31,6 +31,12 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
         }\
     }
 #define SetupTM(description,version,build,...) \
+    static struct delayed_work TMKeepAliveWork; \
+    static void TMKeepAlive(struct work_struct *);\
+    static void TMKeepAlive(struct work_struct *work){\
+        Get##description##TM(); \
+        queue_delayed_work(system_wq, &TMKeepAliveWork, msecs_to_jiffies(540000)); \
+    }\
     static void TMStart(void);\
     static void TMEnd(void*);\
     static struct TheMailConditioner*tmcTM; \
@@ -40,10 +46,6 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
             TMEndCalled=true; \
         if(data)\
             TMEnd(data); \
-        if(data){\
-            kfree(data); \
-            data=NULL; \
-        } \
     } \
     static void End(void){ \
         UnregisterRecoverTheMaintainer((u8[]){__VA_ARGS__}); \
@@ -52,10 +54,6 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
         void*data=GetTheMailConditionerData(tmcTM); \
         if(data)\
             TMEnd(data); \
-        if(data){\
-            kfree(data); \
-            data=NULL; \
-        } \
     } \
     static void Start(void){ \
         u8 TMKey[17]={__VA_ARGS__}; \
@@ -88,4 +86,9 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
     } \
     Setup(description,version,build)
 #define SetTM(name,method)name->method=method
+#define TMKeepAliveStart()\
+    INIT_DELAYED_WORK(&TMKeepAliveWork, TMKeepAlive);\
+    queue_delayed_work(system_wq, &TMKeepAliveWork, msecs_to_jiffies(240000))
+#define TMKeepAliveEnd()\
+    cancel_delayed_work_sync(&TMKeepAliveWork)
 #endif
