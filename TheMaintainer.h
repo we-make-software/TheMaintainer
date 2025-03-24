@@ -30,10 +30,6 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
             return failback;\
         }\
     }
-
-
-
-
 #define SetupTM(description,version,build,...) \
     static void TMStart(void);\
     static void TMEnd(void*);\
@@ -91,4 +87,3 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
     Setup(description,version,build)
 #define SetTM(name,method)name->method=method
 #endif
-
