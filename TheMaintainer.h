@@ -32,8 +32,8 @@ extern void TriggerRecoverTheMaintainer(u8*ID);
     }
 #define SetupTM(description,version,build,...) \
     static struct delayed_work TMKeepAliveWork; \
-    static void TMKeepAlive(struct work_struct *);\
-    static void TMKeepAlive(struct work_struct *work){\
+    static void __maybe_unused TMKeepAlive(struct work_struct *);\
+    static void __maybe_unused TMKeepAlive(struct work_struct *work){\
         Get##description##TM(); \
         queue_delayed_work(system_wq, &TMKeepAliveWork, msecs_to_jiffies(540000)); \
     }\
